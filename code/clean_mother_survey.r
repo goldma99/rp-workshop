@@ -35,8 +35,24 @@ mother_survey <-
     ) 
 
 # Remove duplicate village_id
-mother_survey %>%
+mother_survey <-
+    mother_survey %>%
     select(-village_id.y) %>%
     rename(village_id = village_id.x)
 
-# Some child ages are fractional :\\
+# Some child are fractional :\\
+
+
+# Calculate average age of children
+mother_survey %>% 
+    select(mother_id, starts_with("age_")) %>%
+    pivot_longer(
+        cols = starts_with("age_"),
+        names_to = "child",
+        values_to = "age"
+    ) %>%
+    mutate(child = str_remove_all(child, "age_")) %>%
+    summarise(
+        mean_age = mean(age, na.rm = TRUE)
+    )
+
