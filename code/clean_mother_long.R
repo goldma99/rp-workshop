@@ -33,4 +33,9 @@ df.result %>%
   saveRDS("./data/tidy/mother.RDS")
 
 
+# Find the average ages of mothers
+df.result %>% 
+  pull(age) %>% 
+  mean()
+
 
