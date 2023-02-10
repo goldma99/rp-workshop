@@ -10,11 +10,11 @@ str(ml) # mother_id, name, value
 str(ms) #village_id, mother_id, age, educ, n_children, age of these children, sex of these children, in_school of these children
 
 # Exercise1.
-## Write code to calculate the average age of children in the data 
+## a) Write code to calculate the average age of children in the data 
 child <- fread("/Users/jieonki0/Documents/GitHub/rp-workshop/data/tidy/child.csv")
 mean(child$age) #8.312073
 
-## Write code to calculate the average age of mothers in the data 
+## b) Write code to calculate the average age of mothers in the data 
 child_analyis <- fread("/Users/jieonki0/Documents/GitHub/rp-workshop/data/analysis/child.csv")
 mother <- fread("/Users/jieonki0/Documents/GitHub/rp-workshop/data/tidy/mother.csv")
 ml
@@ -39,13 +39,59 @@ unique(child$sex) # 4 different categories in sex, which we don't want
 install.packages(c("skimr","dataReporter"))
 library(skimr)
 library(dataReporter)
-skim(child)
-makeDataReport(child)
+skimchild <- skim(child)
 
 install.packages(c("dataMeta","datadictionary"))
-lir
 
-## Convert each variable to the format that is most appropriate for it in the software you are using
-## Save the new data set in the data/clean folder
-## Save a data dictionary or data summary and in the same folder
+
+# Exercise3. Using new_data
+## 1) Convert each variable to the format that is most appropriate for it in the software you are using
+## 2) Save the new data set in the data/clean folder
+## 3) Save a data dictionary or data summary and in the same folder
+
+child <- read_rds("/Users/jieonki0/Documents/GitHub/rp-workshop/data/new_data/tidy/child.rds")
+child$village_id <- as.numeric(child$village_id)
+child$mother_id <- as.numeric(child$mother_id)
+child$child_id <- as.numeric(child$child_id)
+child$sex <- ifelse(child$sex %in% c("F","female","Female"),"F","M")
+
+write_rds(child,"/Users/jieonki0/Documents/GitHub/rp-workshop/Ji_WIP/data/clean/child.rds")
+makeDataReport(child,replace=T)
+
+mother <- read_rds("/Users/jieonki0/Documents/GitHub/rp-workshop/data/new_data/tidy/mother.rds")
+skim(mother)
+
+
+
+# Exercise4. Making corrections
+## a) Is the data set uniquely and fully identified?
+n_distinct(child$child_id)==nrow(child)
+n_distinct(mother$mother_id)==nrow(mother)
+
+## b) Are there any issues with completeness?
+skim(child) #88 missing in grade
+skim(mother) #no missing 
+
+## c) Are there any inconsistencies in the data?
+library(validate)
+rules <- validator(child$yob <= 2023
+                   ,!is.na(child$grade) && child$in_school==1
+                  )
+out   <- confront(child, rules)
+summary(out)
+
+rules2 <- validator(mother$age %%1 ==0,
+                    mother$n_children %% 1 ==0
+                    
+                    )
+out2 <- confront(mother, rules2)
+summary(out2)
+
+## d) Are the potentially problematic outliers?
+
+
+
+
+
+
 
